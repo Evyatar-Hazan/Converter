@@ -1,0 +1,92 @@
+<!-- CSV to JSON Tool (standalone page) -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV to JSON Converter</title>
+    <meta name="description" content="Convert CSV to JSON online. Fast, private, and free.">
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <a href="../index.html" class="back-link">← Back to Hub</a>
+            <h1>CSV to JSON Converter</h1>
+            <p class="description">Easily transform your CSV data into clean JSON. Fast, private, and works entirely in
+                your browser.</p>
+        </header>
+        <main>
+            <div class="card">
+                <h2 class="section-title">Step 1: Paste your CSV here</h2>
+                <textarea id="csvInput"
+                    placeholder="id,name,role\n1,Antigravity,Assistant\n2,User,Developer"></textarea>
+                <div id="errorMessage" class="error-msg"></div>
+                <div class="btn-container">
+                    <button id="convertBtn" class="btn btn-primary">Convert to JSON</button>
+                </div>
+            </div>
+            <div class="ads-placeholder">AdSense Ad Space</div>
+            <div class="card" id="outputSection" style="display: none;">
+                <h2 class="section-title">Step 2: Your JSON Result</h2>
+                <textarea id="jsonOutput" readonly></textarea>
+                <div class="btn-container">
+                    <button id="downloadBtn" class="btn btn-success">Download JSON File</button>
+                </div>
+            </div>
+            <section class="instructions">
+                <h2>How to Use</h2>
+                <p>Paste your CSV and click "Convert to JSON". All processing is local. Download your JSON instantly.
+                </p>
+            </section>
+        </main>
+        <footer>
+            <p>&copy; 2026 Universal Data Converter. All rights reserved.</p>
+        </footer>
+    </div>
+    <script src="../js/csv-to-json.js"></script>
+    <script src="../js/downloader.js"></script>
+    <script src="../js/analytics.js"></script>
+    <script>
+        initAnalytics('G-66CY0Q6VPS');
+        const csvInput = document.getElementById('csvInput');
+        const jsonOutput = document.getElementById('jsonOutput');
+        const convertBtn = document.getElementById('convertBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const outputSection = document.getElementById('outputSection');
+        const errorMessage = document.getElementById('errorMessage');
+        window.addEventListener('load', () => {
+            const savedCsv = localStorage.getItem('csvToJson_input');
+            if (savedCsv) csvInput.value = savedCsv;
+        });
+        csvInput.addEventListener('input', () => {
+            localStorage.setItem('csvToJson_input', csvInput.value);
+        });
+        convertBtn.addEventListener('click', () => {
+            const input = csvInput.value.trim();
+            if (!input) return showError('Please enter some CSV data.');
+            try {
+                const json = csvToJson(input);
+                jsonOutput.value = json;
+                outputSection.style.display = 'block';
+                downloadBtn.style.display = 'inline-flex';
+                errorMessage.style.display = 'none';
+            } catch (err) {
+                showError(err.message);
+            }
+        });
+        downloadBtn.addEventListener('click', () => {
+            const content = jsonOutput.value;
+            if (content) downloadJson(content, 'converted_data.json');
+        });
+        function showError(msg) {
+            errorMessage.textContent = msg;
+            errorMessage.style.display = 'block';
+            outputSection.style.display = 'none';
+        }
+    </script>
+</body>
+
+</html>

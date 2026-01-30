@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JSON to CSV Converter - Tests</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>body{padding:2rem;}</style>
+</head>
+<body>
+    <h1>JSON to CSV - Automated Tests</h1>
+    <div id="results"></div>
+    <script src="../js/json-to-csv.js"></script>
+    <script>
+        const resultsEl = document.getElementById('results');
+        function runTest(name, input, expected, shouldThrow = false) {
+            const div = document.createElement('div');
+            div.className = 'test-case';
+            div.innerHTML = `<strong>Test: ${name}</strong><br>`;
+            try {
+                const result = jsonToCsv(input);
+                if (shouldThrow) {
+                    div.innerHTML += `<span class='fail'>FAIL: Expected to throw but returned result.</span>`;
+                } else if (result.trim() === expected.trim()) {
+                    div.innerHTML += `<span class='pass'>PASS</span>`;
+                } else {
+                    div.innerHTML += `<span class='fail'>FAIL</span><br>Expected:<pre>${expected}</pre>Got:<pre>${result}</pre>`;
+                }
+            } catch (err) {
+                if (shouldThrow) {
+                    div.innerHTML += `<span class='pass'>PASS (Threw as expected: ${err.message})</span>`;
+                } else {
+                    div.innerHTML += `<span class='fail'>FAIL: Threw unexpected error: ${err.message}</span>`;
+                }
+            }
+            resultsEl.appendChild(div);
+        }
+        runTest('Single Object', {"a":1,"b":2}, 'a,b\n1,2');
+        runTest('Array of Objects', [{"name":"Alice","age":25},{"name":"Bob","age":30}], 'name,age\nAlice,25\nBob,30');
+        runTest('Missing Values', [{"name":"Alice","title":"Dev"},{"name":"Bob","age":30}], 'name,title,age\nAlice,Dev,\nBob,,30');
+        runTest('Special Characters (Comma)', [{"name":"Doe, Jane","city":"NY"}], 'name,city\n"Doe, Jane",NY');
+        runTest('Invalid JSON String', '{ invalid json ]', '', true);
+        console.log('Tests complete.');
+    </script>
+</body>
+</html>

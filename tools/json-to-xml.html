@@ -1,0 +1,96 @@
+<!-- JSON to XML Tool (standalone page) -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON to XML Converter</title>
+    <meta name="description" content="Convert JSON to XML online. Fast, private, and free.">
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <a href="../index.html" class="back-link">← Back to Hub</a>
+            <h1>JSON to XML Converter</h1>
+            <p class="description">Convert your JSON into clean, well-formed XML instantly. Runs entirely in your
+                browser for privacy.</p>
+        </header>
+        <main>
+            <div class="card">
+                <h2 class="section-title">Step 1: Paste your JSON here</h2>
+                <textarea id="jsonInput" placeholder='{
+  "name": "Example",
+  "items": [
+    { "id": 1, "value": "Alpha" },
+    { "id": 2, "value": "Beta" }
+  ]
+}'></textarea>
+                <div id="errorMessage" class="error-msg"></div>
+                <div class="btn-container">
+                    <button id="convertBtn" class="btn btn-primary">Convert to XML</button>
+                </div>
+            </div>
+            <div class="ads-placeholder">AdSense Ad Space</div>
+            <div class="card" id="outputSection" style="display: none;">
+                <h2 class="section-title">Step 2: Your XML Result</h2>
+                <textarea id="xmlOutput" readonly></textarea>
+                <div class="btn-container">
+                    <button id="downloadBtn" class="btn btn-success">Download XML File</button>
+                </div>
+            </div>
+            <section class="instructions">
+                <h2>How to Use</h2>
+                <p>Paste your JSON and click "Convert to XML". All processing is local. Download your XML instantly.</p>
+            </section>
+        </main>
+        <footer>
+            <p>&copy; 2026 Universal Data Converter. All rights reserved.</p>
+        </footer>
+    </div>
+    <script src="../js/json-to-xml.js"></script>
+    <script src="../js/downloader.js"></script>
+    <script src="../js/analytics.js"></script>
+    <script>
+        initAnalytics('G-66CY0Q6VPS');
+        const jsonInput = document.getElementById('jsonInput');
+        const xmlOutput = document.getElementById('xmlOutput');
+        const convertBtn = document.getElementById('convertBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const outputSection = document.getElementById('outputSection');
+        const errorMessage = document.getElementById('errorMessage');
+        window.addEventListener('load', () => {
+            const savedJson = localStorage.getItem('jsonToXml_input');
+            if (savedJson) jsonInput.value = savedJson;
+        });
+        jsonInput.addEventListener('input', () => {
+            localStorage.setItem('jsonToXml_input', jsonInput.value);
+        });
+        convertBtn.addEventListener('click', () => {
+            const input = jsonInput.value.trim();
+            if (!input) return showError('Please enter some JSON data.');
+            try {
+                const xml = jsonToXml(input, 'root');
+                xmlOutput.value = xml;
+                outputSection.style.display = 'block';
+                downloadBtn.style.display = 'inline-flex';
+                errorMessage.style.display = 'none';
+            } catch (err) {
+                showError(err.message);
+            }
+        });
+        downloadBtn.addEventListener('click', () => {
+            const content = xmlOutput.value;
+            if (content) downloadXml(content, 'converted_data.xml');
+        });
+        function showError(msg) {
+            errorMessage.textContent = msg;
+            errorMessage.style.display = 'block';
+            outputSection.style.display = 'none';
+        }
+    </script>
+</body>
+
+</html>

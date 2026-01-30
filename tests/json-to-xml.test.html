@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JSON to XML Converter - Tests</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>body{padding:2rem;}</style>
+</head>
+<body>
+    <h1>JSON to XML - Automated Tests</h1>
+    <div id="results"></div>
+    <script src="../js/json-to-xml.js"></script>
+    <script>
+        const resultsEl = document.getElementById('results');
+        function runTest(name, input, expected, shouldThrow = false) {
+            const div = document.createElement('div');
+            div.className = 'test-case';
+            div.innerHTML = `<strong>Test: ${name}</strong><br>`;
+            try {
+                const result = jsonToXml(input);
+                if (shouldThrow) {
+                    div.innerHTML += `<span class='fail'>FAIL: Expected to throw but returned result.</span>`;
+                } else if (result.trim() === expected.trim()) {
+                    div.innerHTML += `<span class='pass'>PASS</span>`;
+                } else {
+                    div.innerHTML += `<span class='fail'>FAIL</span><br>Expected:<pre>${expected}</pre>Got:<pre>${result}</pre>`;
+                }
+            } catch (err) {
+                if (shouldThrow) {
+                    div.innerHTML += `<span class='pass'>PASS (Threw as expected: ${err.message})</span>`;
+                } else {
+                    div.innerHTML += `<span class='fail'>FAIL: Threw unexpected error: ${err.message}</span>`;
+                }
+            }
+            resultsEl.appendChild(div);
+        }
+        runTest('Single Object', { "a": 1, "b": 2 }, '<root>\n  <a>1</a>\n  <b>2</b>\n</root>');
+        runTest('Array of Objects', [ { "name": "Alice", "age": 25 }, { "name": "Bob", "age": 30 } ], '<root>\n  <item>\n    <name>Alice</name>\n    <age>25</age>\n  </item>\n  <item>\n    <name>Bob</name>\n    <age>30</age>\n  </item>\n</root>');
+        runTest('Nested Object', { "user": { "name": "Jane", "address": { "city": "NY", "zip": "10001" } } }, '<root>\n  <user>\n    <name>Jane</name>\n    <address>\n      <city>NY</city>\n      <zip>10001</zip>\n    </address>\n  </user>\n</root>');
+        runTest('Escapes Special Characters', { "note": '5 > 3 & 2 < 4 "ok"' }, '<root>\n  <note>5 &gt; 3 &amp; 2 &lt; 4 &quot;ok&quot;</note>\n</root>');
+        runTest('Invalid JSON String', '{ invalid json ]', '', true);
+        console.log('Tests complete.');
+    </script>
+</body>
+</html>
